@@ -25,7 +25,7 @@ npm run lint
 Для запуска форматтера выполните:
 
 ```
-npm run format
+npm run prettier
 ```
 
 ### Функциональные требования
