@@ -1,3 +1,4 @@
+import { clsx } from 'clsx';
 import { useState } from 'react';
 import {
   defaultArticleState,
@@ -20,19 +21,23 @@ import styles from './ArticleParamsForm.module.scss';
 
 type ArticleParamsFormProps = {
   onApply: (settings: ArticleStateType) => void;
+  isOpen: boolean;
+  onToggle: () => void;
 };
 
 export const ArticleParamsForm = ({
   onApply,
+  isOpen,
+  onToggle,
 }: ArticleParamsFormProps): React.JSX.Element => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [settings, setSettings] = useState<ArticleStateType>(defaultArticleState);
+  const [articleParamsFormState, setArticleParamsFormState] =
+    useState<ArticleStateType>(defaultArticleState);
 
   const handleSettingChange = (
     key: keyof ArticleStateType
   ): ((value: OptionType) => void) => {
     return (value: OptionType): void => {
-      setSettings((prev) => ({
+      setArticleParamsFormState((prev) => ({
         ...prev,
         [key]: value,
       }));
@@ -41,19 +46,19 @@ export const ArticleParamsForm = ({
 
   const handleReset = (event: React.FormEvent<HTMLFormElement>): void => {
     event.preventDefault();
-    setSettings(defaultArticleState);
+    setArticleParamsFormState(defaultArticleState);
     onApply(defaultArticleState);
   };
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>): void => {
     event.preventDefault();
-    onApply(settings);
+    onApply(articleParamsFormState);
   };
 
   return (
-    <>
-      <ArrowButton isOpen={isOpen} onClick={() => setIsOpen(!isOpen)} />
-      <aside className={`${styles.container} ${isOpen ? styles.container_open : ''}`}>
+    <div onClick={(event) => event.stopPropagation()}>
+      <ArrowButton isOpen={isOpen} onClick={onToggle} />
+      <aside className={clsx(styles.container, { [styles.container_open]: isOpen })}>
         <form className={styles.form} onReset={handleReset} onSubmit={handleSubmit}>
           <div className={styles.formContainer}>
             <Text as="h2" size={31} weight={800} uppercase>
@@ -62,33 +67,33 @@ export const ArticleParamsForm = ({
             <Select
               title="Шрифт"
               options={fontFamilyOptions}
-              selected={settings.fontFamilyOption}
+              selected={articleParamsFormState.fontFamilyOption}
               onChange={handleSettingChange('fontFamilyOption')}
             />
             <RadioGroup
               title="Размер шрифта"
               name="fontSize"
               options={fontSizeOptions}
-              selected={settings.fontSizeOption}
+              selected={articleParamsFormState.fontSizeOption}
               onChange={handleSettingChange('fontSizeOption')}
             />
             <Select
               title="Цвет шрифта"
               options={fontColors}
-              selected={settings.fontColor}
+              selected={articleParamsFormState.fontColor}
               onChange={handleSettingChange('fontColor')}
             />
             <Separator />
             <Select
               title="Цвет фона"
               options={backgroundColors}
-              selected={settings.backgroundColor}
+              selected={articleParamsFormState.backgroundColor}
               onChange={handleSettingChange('backgroundColor')}
             />
             <Select
               title="Ширина контента"
               options={contentWidthArr}
-              selected={settings.contentWidth}
+              selected={articleParamsFormState.contentWidth}
               onChange={handleSettingChange('contentWidth')}
             />
           </div>
@@ -98,6 +103,6 @@ export const ArticleParamsForm = ({
           </div>
         </form>
       </aside>
-    </>
+    </div>
   );
 };
