@@ -14,13 +14,6 @@ import styles from './app.module.scss';
 export const App = (): React.JSX.Element => {
   const [articleState, setArticleState] =
     useState<ArticleStateType>(defaultArticleState);
-  const [isArticleParamsFormOpen, setIsArticleParamsFormOpen] = useState(false);
-  const handleClose = (): void => {
-    setIsArticleParamsFormOpen(false);
-  };
-  const handleToggle = (): void => {
-    setIsArticleParamsFormOpen((prev) => !prev);
-  };
   return (
     <main
       className={clsx(styles.main)}
@@ -33,13 +26,8 @@ export const App = (): React.JSX.Element => {
           '--bg-color': articleState.backgroundColor.value,
         } as CSSProperties
       }
-      onClick={handleClose}
     >
-      <ArticleParamsForm
-        onApply={setArticleState}
-        isOpen={isArticleParamsFormOpen}
-        onToggle={handleToggle}
-      />
+      <ArticleParamsForm onApply={setArticleState} />
       <Article />
     </main>
   );

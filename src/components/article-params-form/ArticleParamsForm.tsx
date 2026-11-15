@@ -1,5 +1,5 @@
 import { clsx } from 'clsx';
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import {
   defaultArticleState,
   fontFamilyOptions,
@@ -21,17 +21,31 @@ import styles from './ArticleParamsForm.module.scss';
 
 type ArticleParamsFormProps = {
   onApply: (settings: ArticleStateType) => void;
-  isOpen: boolean;
-  onToggle: () => void;
 };
 
 export const ArticleParamsForm = ({
   onApply,
-  isOpen,
-  onToggle,
 }: ArticleParamsFormProps): React.JSX.Element => {
   const [articleParamsFormState, setArticleParamsFormState] =
     useState<ArticleStateType>(defaultArticleState);
+  const [isArticleParamsFormOpen, setIsArticleParamsFormOpen] = useState(false);
+  const formRef = useRef<HTMLDivElement>(null);
+
+  useEffect((): (() => void) => {
+    const handleClickOutside = (event: MouseEvent): void => {
+      if (
+        isArticleParamsFormOpen &&
+        formRef.current &&
+        !formRef.current.contains(event.target as Node)
+      ) {
+        handleClose();
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isArticleParamsFormOpen]);
 
   const handleSettingChange = (
     key: keyof ArticleStateType
@@ -42,6 +56,14 @@ export const ArticleParamsForm = ({
         [key]: value,
       }));
     };
+  };
+
+  const handleToggle = (): void => {
+    setIsArticleParamsFormOpen((prev) => !prev);
+  };
+
+  const handleClose = (): void => {
+    setIsArticleParamsFormOpen(false);
   };
 
   const handleReset = (event: React.FormEvent<HTMLFormElement>): void => {
@@ -56,9 +78,13 @@ export const ArticleParamsForm = ({
   };
 
   return (
-    <div onClick={(event) => event.stopPropagation()}>
-      <ArrowButton isOpen={isOpen} onClick={onToggle} />
-      <aside className={clsx(styles.container, { [styles.container_open]: isOpen })}>
+    <div ref={formRef}>
+      <ArrowButton isOpen={isArticleParamsFormOpen} onClick={handleToggle} />
+      <aside
+        className={clsx(styles.container, {
+          [styles.container_open]: isArticleParamsFormOpen,
+        })}
+      >
         <form className={styles.form} onReset={handleReset} onSubmit={handleSubmit}>
           <div className={styles.formContainer}>
             <Text as="h2" size={31} weight={800} uppercase>
