@@ -31,14 +31,13 @@ export const ArticleParamsForm = ({
   const [isArticleParamsFormOpen, setIsArticleParamsFormOpen] = useState(false);
   const formRef = useRef<HTMLDivElement>(null);
 
-  useEffect((): (() => void) => {
+  useEffect((): (() => void) | undefined => {
+    if (!isArticleParamsFormOpen) {
+      return;
+    }
     const handleClickOutside = (event: MouseEvent): void => {
-      if (
-        isArticleParamsFormOpen &&
-        formRef.current &&
-        !formRef.current.contains(event.target as Node)
-      ) {
-        handleClose();
+      if (formRef.current && !formRef.current.contains(event.target as Node)) {
+        setIsArticleParamsFormOpen(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
@@ -60,10 +59,6 @@ export const ArticleParamsForm = ({
 
   const handleToggle = (): void => {
     setIsArticleParamsFormOpen((prev) => !prev);
-  };
-
-  const handleClose = (): void => {
-    setIsArticleParamsFormOpen(false);
   };
 
   const handleReset = (event: React.FormEvent<HTMLFormElement>): void => {
